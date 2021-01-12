@@ -18,7 +18,7 @@ config_schema = dict(
     CLOUD_API_KEY=dict(cast=str, default=None),
 
     ZONE_CONFIG_NAME=str,
-    KEY_TYPE=str,
+    KEY_TYPE=dict(cast=str, default='RSA'),
     DNS_NAMES=dict(cast=list, subcast=str, default=()),
     IP_ADDRESSES=dict(cast=list, subcast=str, default=()),
     EMAIL_ADDRESSES=dict(cast=list, subcast=str, default=()),
@@ -39,7 +39,6 @@ config_schema = dict(
 @dataclass(frozen=True)
 class RequestCertificateConfig:
     zone_config_name: str
-    key_type: str
     common_name: str
     priv_key_output: str
     cert_output: str
@@ -52,6 +51,7 @@ class RequestCertificateConfig:
 
     cloud_api_key: str = None
 
+    key_type: str = 'RSA'
     dns_names: List[str] = ()
     ip_addresses: List[str] = ()
     email_addresses: List[str] = ()
@@ -79,6 +79,8 @@ class RequestCertificateCommand:
                 'TPP_PASSWORD', config.tpp_password,
                 'TPP_PASSWORD_BASE64', config.tpp_password_base64
             )
+        if config.key_type not in ('RSA', 'ECDSA'):
+            raise envparse.ConfigurationError("'KEY_TYPE' may only be 'RSA' or 'ECDSA'.")
 
         self.logger = logger
         self.config = config
@@ -87,12 +89,17 @@ class RequestCertificateCommand:
         conn = self._create_connection_object()
         req = self._create_certificate_request(conn)
 
-        zone_config = conn.read_zone_config(self.config.zone_config_name)
+        zone_config = conn.read_zone_conf(self.config.zone_config_name)
         req.update_from_zone_config(zone_config)
 
+        self.logger.info('Requesting certificate')
         conn.request_cert(req, self.config.zone_config_name)
+
+        self.logger.info('Retrieving certificate')
         cert = self._retrieve_certificate(conn, req)
-        self._write_output(cert)
+
+        self.logger.info('Writing output')
+        self._write_output(req, cert)
 
     def _create_connection_object(self) -> vcert.CommonConnection:
         if self.config.tpp_base_url is not None:
@@ -110,6 +117,14 @@ class RequestCertificateCommand:
         else:
             return str(base64.b64decode(self.config.tpp_password_base64), 'utf-8')
 
+    def _get_key_type(self) -> vcert.KeyType:
+        if self.config.key_type == 'RSA':
+            return vcert.KeyType(vcert.KeyType.RSA, 4096)
+        elif self.config.key_type == 'ECDSA':
+            return vcert.KeyType(vcert.KeyType.ECDSA, "p521")
+        else:
+            raise RuntimeError(f'BUG: unrecognized key type {self.config.key_type}')
+
     def _create_certificate_request(self, conn: vcert.CommonConnection) -> vcert.CertificateRequest:
         return vcert.CertificateRequest(
             key_type=self._get_key_type(),
@@ -123,10 +138,10 @@ class RequestCertificateCommand:
             country=self.config.country,
         )
 
-    def _retrieve_certificate(self, conn: vcert.CommonConnection, req: vcert.CertificateRequest) -> pem.Certificate:
+    def _retrieve_certificate(self, conn: vcert.CommonConnection, req: vcert.CertificateRequest) -> vcert.pem.Certificate:
         deadline = time.monotonic() + 300
         while time.monotonic() < deadline:
-            cert = conn.retrieve_cert(request)
+            cert = conn.retrieve_cert(req)
             if cert:
                 return cert
             else:
@@ -135,13 +150,13 @@ class RequestCertificateCommand:
         self.logger.fatal('Timeout retrieving certificate')
         raise utils.AbortException()
 
-    def _write_output(self, req: vcert.CertificateRequest, cert: pem.Certificate):
+    def _write_output(self, req: vcert.CertificateRequest, cert: vcert.pem.Certificate):
         with open(self.config.priv_key_output, 'w') as f:
             f.write(req.private_key_pem)
         with open(self.config.cert_output, 'w') as f:
             f.write(cert.cert)
-        with open(self.config.cert_chain, 'w') as f:
-            f.write(req.chain)
+        with open(self.config.cert_chain_output, 'w') as f:
+            f.write("\n".join(cert.chain))
 
 
 def main():
