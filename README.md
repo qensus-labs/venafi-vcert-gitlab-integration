@@ -8,12 +8,12 @@ This plugin integrates [Venafi Machine Identity Protection](https://support.vena
  - [Setting up executor hosts (shell and SSH executors only)](#setting-up-executor-hosts-shell-and-ssh-executors-only)
  - [Compatibility](#compatibility)
  - [Operations](#operations)
-    - [Venafi Machine Identity Protection: request certificate]
-       - [Usage with Docker executor]
-       - [Usage with shell or SSH executor]
-       - [Variables: general]
-       - [Variables: subject information]
-       - [Variables: output]
+    - [Venafi Machine Identity Protection: request certificate](#venafi-machine-identity-protection-request-certificate)
+       - [Usage with Docker executor](#usage-with-docker-executor)
+       - [Usage with shell or SSH executor](#usage-with-shell-or-ssh-executor)
+       - [Variables: general](#variables-general)
+       - [Variables: subject information](#variables-subject-information)
+       - [Variables: output](#variables-output)
 
 ## Usage overview
 
