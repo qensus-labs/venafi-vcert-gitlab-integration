@@ -45,7 +45,7 @@ Requests a pair of certificate + private key. The output is to be written to the
 #### Usage with Docker executor
 
  * Define a job that calls `venafi-vcert-request-certificate`.
- * Ensure the job operates within the image `quay.io/fullstaq-venafi-gitlab-integration/vcert-x86_64`.
+ * Ensure the job operates within the image `quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert-x86_64`.
  * Specify:
     - Connection and authentication details for either a TPP, or for DevOpsACCELERATE.
     - Certificate request parameters.
@@ -54,7 +54,7 @@ Requests a pair of certificate + private key. The output is to be written to the
 
 ~~~yaml
 request_cert:
-  image: quay.io/fullstaq-venafi-gitlab-integration/vcert-x86_64
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert-x86_64
   script:
     - venafi-vcert-request-certificate
   variables:
