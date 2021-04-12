@@ -26,6 +26,7 @@ setuptools.setup(
     },
     entry_points={
         'console_scripts': [
+            'venafi-vcert-version=venafi_vcert_gitlab_integration.version_command:main',  # noqa:E501
             'venafi-vcert-request-certificate=venafi_vcert_gitlab_integration.request_certificate_command:main',  # noqa:E501
         ]
     },
