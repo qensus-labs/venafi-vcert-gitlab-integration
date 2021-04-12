@@ -1,4 +1,4 @@
-# Venafi Machine Identity Protection plugin for Gitlab
+# Venafi Machine Identity Protection integration for Gitlab
 
 This plugin integrates [Venafi Machine Identity Protection](https://support.venafi.com/hc/en-us/articles/217991528-Introducing-VCert-API-Abstraction-for-DevOps) with Gitlab-based CI/CD processes.
 
