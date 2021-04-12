@@ -138,7 +138,7 @@ class RequestCertificateCommand:
             country=self.config.country,
         )
 
-    def _retrieve_certificate(self, conn: vcert.CommonConnection, req: vcert.CertificateRequest) -> vcert.pem.Certificate:
+    def _retrieve_certificate(self, conn: vcert.CommonConnection, req: vcert.CertificateRequest) -> vcert.pem.Certificate:  # noqa: E501
         deadline = time.monotonic() + 300
         while time.monotonic() < deadline:
             cert = conn.retrieve_cert(req)
