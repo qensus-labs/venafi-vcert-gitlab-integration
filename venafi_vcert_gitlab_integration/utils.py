@@ -26,3 +26,10 @@ def create_dataclass_inputs_from_env(schema):
     for key in schema.keys():
         result[key.lower()] = env(key)
     return result
+
+
+def cast_bool(val):
+    if val is None:
+        return False
+    else:
+        return str(val).lower() in ('t', 'true', 'yes', 'y', '1', 'on')
