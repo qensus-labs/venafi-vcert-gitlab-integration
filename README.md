@@ -18,7 +18,7 @@ This plugin integrates [Venafi Machine Identity Management](https://support.vena
        - [Usage with Docker executor](#usage-with-docker-executor-1)
        - [Usage with shell or SSH executor](#usage-with-shell-or-ssh-executor-1)
        - [Variables](#variables)
-    - [Renewing certificate only when expiration is near](renewing-certificate-only-when-expiration-is-near)
+    - [Renewing certificate only when expiration is near](#renewing-certificate-only-when-expiration-is-near)
 
 ## Usage overview
 
