@@ -14,7 +14,7 @@ setuptools.setup(
     license='Apache 2.0',
     author='Fullstaq',
     author_email='info@fullstaq.com',
-    description='Venafi Machine Identity Protection: Gitlab integration',
+    description='Venafi Machine Identity Management: Gitlab integration',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/fullstaq-labs/venafi-vcert-gitlab-integration",
