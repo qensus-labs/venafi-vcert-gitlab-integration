@@ -127,7 +127,7 @@ class RequestCertificateCommand:
         try:
             cert = x509.load_pem_x509_certificate(data)
             return cert.not_valid_after
-        except e:
+        except Exception as e:
             self.logger.error(
                 'Error loading previous certificate (%s): %s',
                 self.config.cert_output,

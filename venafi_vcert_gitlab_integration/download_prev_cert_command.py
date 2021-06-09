@@ -27,7 +27,7 @@ class DownloadPrevCertConfig:
             branch_name=cls._getenv('BRANCH_NAME', 'CI_COMMIT_REF_NAME'),
             requester_job_name=cls._getenv('REQUESTER_JOB_NAME'),
             cert_filename=cls._getenv('CERT_FILENAME'),
-            use_ci_job_token=cls._getenv('USE_CI_JOB_TOKEN', required=False, default=False, cast=utils.cast_bool),
+            use_ci_job_token=cls._getenv('USE_CI_JOB_TOKEN', required=False, default=False, cast=utils.cast_bool),  # noqa: E501
             gitlab_bearer_token=cls._getenv('GITLAB_BEARER_TOKEN', required=False),
         )
 
@@ -48,7 +48,7 @@ class DownloadPrevCertConfig:
 class DownloadPrevCertCommand:
     def __init__(self, logger, config: DownloadPrevCertConfig):
         def false_to_none(value):
-            if value == False:
+            if value is False:
                 return None
             else:
                 return value
