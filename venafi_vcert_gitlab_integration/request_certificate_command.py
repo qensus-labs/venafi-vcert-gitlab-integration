@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from typing import List
 from venafi_vcert_gitlab_integration import utils
+from cryptography import x509
 import envparse
 import logging
+import os.path
 import sys
+import datetime
 import base64
 import time
 import vcert
@@ -19,6 +22,7 @@ config_schema = dict(
 
     ZONE_CONFIG_NAME=str,
     KEY_TYPE=dict(cast=str, default='RSA'),
+    EXPIRATION_WINDOW=dict(cast=int, default=0),
     DNS_NAMES=dict(cast=list, subcast=str, default=()),
     IP_ADDRESSES=dict(cast=list, subcast=str, default=()),
     EMAIL_ADDRESSES=dict(cast=list, subcast=str, default=()),
@@ -52,6 +56,7 @@ class RequestCertificateConfig:
     cloud_api_key: str = None
 
     key_type: str = 'RSA'
+    expiration_window: int = 0
     dns_names: List[str] = ()
     ip_addresses: List[str] = ()
     email_addresses: List[str] = ()
@@ -81,11 +86,23 @@ class RequestCertificateCommand:
             )
         if config.key_type not in ('RSA', 'ECDSA'):
             raise envparse.ConfigurationError("'KEY_TYPE' may only be 'RSA' or 'ECDSA'.")
+        if config.expiration_window < 0:
+            raise envparse.ConfigurationError("'EXPIRATION_WINDOW' may not be negative.")
 
         self.logger = logger
         self.config = config
 
     def run(self):
+        expiration_time = self._get_prev_cert_expiration_time()
+        if not self._within_expiration_window(expiration_time):
+            self.logger.warning(
+                "Previous certificate's expiry time (%s) is not within the" +
+                ' expiration window of %d hours. Not requesting a certificate.',
+                expiration_time,
+                self.config.expiration_window
+            )
+            return
+
         conn = self._create_connection_object()
         req = self._create_certificate_request(conn)
 
@@ -100,6 +117,45 @@ class RequestCertificateCommand:
 
         self.logger.info('Writing output')
         self._write_output(req, cert)
+
+    def _get_prev_cert_expiration_time(self):
+        if not os.path.exists(self.config.cert_output):
+            return None
+
+        with open(self.config.cert_output, 'rb') as f:
+            data = f.read()
+        try:
+            cert = x509.load_pem_x509_certificate(data)
+            return cert.not_valid_after
+        except e:
+            self.logger.error(
+                'Error loading previous certificate (%s): %s',
+                self.config.cert_output,
+                e
+            )
+            raise utils.AbortException()
+
+    def _within_expiration_window(self, expiration_time):
+        if self.config.expiration_window == 0:
+            return True
+        elif expiration_time is None:
+            self.logger.warning(
+                'An expiration window is configured, but the previous certificate' +
+                ' (%s) does not exist. Will proceed with requesting a new certificate.',
+                self.config.cert_output
+            )
+            return True
+        else:
+            threshold = expiration_time - datetime.timedelta(hours=self.config.expiration_window)
+            result = datetime.datetime.now() > threshold
+            if result:
+                self.logger.info(
+                    "Previous certificate's expiry time (%s) is within the expiration window of" +
+                    ' %d hours. Will proceed with requesting a certificate.',
+                    expiration_time,
+                    self.config.expiration_window
+                )
+            return result
 
     def _create_connection_object(self) -> vcert.CommonConnection:
         if self.config.tpp_base_url is not None:

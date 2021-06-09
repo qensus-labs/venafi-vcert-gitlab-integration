@@ -28,11 +28,14 @@ setuptools.setup(
         'console_scripts': [
             'venafi-vcert-version=venafi_vcert_gitlab_integration.version_command:main',  # noqa:E501
             'venafi-vcert-request-certificate=venafi_vcert_gitlab_integration.request_certificate_command:main',  # noqa:E501
+            'venafi-vcert-download-prev-cert=venafi_vcert_gitlab_integration.download_prev_cert_command:main',  # noqa:E501
         ]
     },
     install_requires=[
         'vcert>=0.9.1,<0.10',
-        'envparse>=0.2.0,<0.3'
+        'envparse>=0.2.0,<0.3',
+        'requests>=2.25.1,<3',
+        'cryptography>=3.4.7,<4',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',

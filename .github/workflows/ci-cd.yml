@@ -93,7 +93,7 @@ jobs:
 
 
   publish_image:
-    name: Publish Jarsigner image
+    name: Publish image
     runs-on: ubuntu-20.04
     needs: test_and_build
     steps:
