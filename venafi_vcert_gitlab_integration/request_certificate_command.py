@@ -18,7 +18,7 @@ config_schema = dict(
     TPP_PASSWORD=dict(cast=str, default=None),
     TPP_PASSWORD_BASE64=dict(cast=str, default=None),
 
-    CLOUD_API_KEY=dict(cast=str, default=None),
+    VENAFI_AS_A_SERVICE_API_KEY=dict(cast=str, default=None),
 
     ZONE_CONFIG_NAME=str,
     KEY_TYPE=dict(cast=str, default='RSA'),
@@ -53,7 +53,7 @@ class RequestCertificateConfig:
     tpp_password: str = None
     tpp_password_base64: str = None
 
-    cloud_api_key: str = None
+    venafi_as_a_service_api_key: str = None
 
     key_type: str = 'RSA'
     expiration_window: int = 0
@@ -76,7 +76,7 @@ class RequestCertificateCommand:
     def __init__(self, logger, config: RequestCertificateConfig):
         utils.check_one_of_two_config_options_set(
             'TPP_BASE_URL', config.tpp_base_url,
-            'CLOUD_API_KEY', config.cloud_api_key
+            'VENAFI_AS_A_SERVICE_API_KEY', config.venafi_as_a_service_api_key
         )
         if config.tpp_base_url is not None:
             utils.check_config_option_set('TPP_USERNAME', config.tpp_username)
@@ -165,7 +165,7 @@ class RequestCertificateCommand:
                 password=self._get_tpp_password()
             )
         else:
-            return vcert.Connection(token=self.config.cloud_api_key)
+            return vcert.Connection(token=self.config.venafi_as_a_service_api_key)
 
     def _get_tpp_password(self) -> str:
         if self.config.tpp_password is not None:

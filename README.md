@@ -143,7 +143,7 @@ Required (when using a TPP):
 
 Required (when using Venafi as a Service):
 
- * `CLOUD_API_KEY`: The Venafi as a Service API key.
+ * `VENAFI_AS_A_SERVICE_API_KEY`: The Venafi as a Service API key.
 
 Required (no matter what you use):
 
