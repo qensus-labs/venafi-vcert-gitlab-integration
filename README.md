@@ -340,7 +340,7 @@ request_cert:
     TPP_USERNAME: my_username
     # TPP_PASSWORD or TPP_PASSWORD_BASE64 should be set in the UI, with masking enabled.
 
-    RENEWAL_WINDOW: 48
+    EXPIRATION_WINDOW: 48
 
     ZONE_CONFIG_NAME: Certificates\\VCert
     COMMON_NAME: yourdomain.com
