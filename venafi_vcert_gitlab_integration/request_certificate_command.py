@@ -183,6 +183,7 @@ class RequestCertificateCommand:
 
     def _create_certificate_request(self, conn: vcert.CommonConnection) -> vcert.CertificateRequest:
         return vcert.CertificateRequest(
+            origin='Fullstaq Gitlab integration',
             key_type=self._get_key_type(),
             common_name=self.config.common_name,
             email_addresses=self.config.email_addresses,
