@@ -52,7 +52,7 @@ Requests a pair of certificate + private key. The output is to be written to the
 #### Usage with Docker executor
 
  * Define a job that calls `venafi-vcert-request-certificate`.
- * Ensure the job operates within the image `quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert`.
+ * Ensure the job operates within the image `quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert`. We recommend that you specify a [tag](https://quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert) in order to avoid breaking changes introduced by new major versions.
  * Specify:
     - Connection and authentication details for either a TPP or for Venafi as a Service.
     - Certificate request parameters.
@@ -61,7 +61,7 @@ Requests a pair of certificate + private key. The output is to be written to the
 
 ~~~yaml
 request_cert:
-  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:1-x86_64
   script:
     - venafi-vcert-request-certificate
   variables:
@@ -208,7 +208,7 @@ This operation is mainly meant to be used for [renewing certificate only when ex
 #### Usage with Docker executor
 
  * Define a job that calls `exec venafi-vcert-download-prev-cert`. **Note**: the `exec` keyword is required to ensure that the Gitlab job exits with the correct exit code.
- * Ensure the job operates within the image `quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert`.
+ * Ensure the job operates within the image `quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert`. We recommend that you specify a [tag](https://quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert) in order to avoid breaking changes introduced by new major versions.
  * Ensure a failure due to exit code 30 is allowed.
  * Ensure that the certificate to download, is also published as an artifact.
  * Specify:
@@ -304,7 +304,7 @@ stages:
 # Download previous certificate artifact.
 download_prev_cert:
   stage: download_prev_cert
-  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:1-x86_64
   script:
     - exec venafi-vcert-download-prev-cert
   variables:
@@ -332,7 +332,7 @@ download_prev_cert:
 # Only request a new certificate if there is no previous certificate,
 # or if the previous certificate expires within 48 hours.
 request_cert:
-  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:1-x86_64
   script:
     - venafi-vcert-request-certificate
   variables:
