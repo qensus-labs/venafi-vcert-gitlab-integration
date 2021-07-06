@@ -31,7 +31,11 @@ You use this Gitlab integration product by defining, inside your Gitlab CI YAML,
 If you plan on using this Gitlab integration product in combination with the shell and SSH executors, then you must install the following software on the hosts on which those executors operate. This Gitlab integration product does not take care of installing these prerequisites for you.
 
  * Install Python >= 3.8. Ensure that it's in PATH.
- * Install our Gitlab integration package: `pip install venafi-vcert-gitlab-integration`
+ * Install pip >= 20.2. This is necessary in order to use the [2020 dependency resolver](https://pyfound.blogspot.com/2020/11/pip-20-3-new-resolver.html).
+ * Install our Gitlab integration package:
+
+    - If you're on pip >= 20.2 but < 20.3, then run: `pip install venafi-vcert-gitlab-integration --use-feature=2020-resolver`
+    - If you're on pip >= 20.3, then run: `pip install venafi-vcert-gitlab-integration`
 
 ## Compatibility
 
@@ -61,7 +65,7 @@ Requests a pair of certificate + private key. The output is to be written to the
 
 ~~~yaml
 request_cert:
-  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:1-x86_64
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:2-x86_64
   script:
     - venafi-vcert-request-certificate
   variables:
@@ -144,6 +148,8 @@ Required (when using Venafi as a Service):
 Required (no matter what you use):
 
  * `ZONE_CONFIG_NAME`: the name of the zone configuration to use.
+
+   When using Venafi as a Service, zone names are in the format of `app name\api alias`
 
 Optional:
 
@@ -304,7 +310,7 @@ stages:
 # Download previous certificate artifact.
 download_prev_cert:
   stage: download_prev_cert
-  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:1-x86_64
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:2-x86_64
   script:
     - exec venafi-vcert-download-prev-cert
   variables:
@@ -332,7 +338,7 @@ download_prev_cert:
 # Only request a new certificate if there is no previous certificate,
 # or if the previous certificate expires within 48 hours.
 request_cert:
-  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:1-x86_64
+  image: quay.io/fullstaq-venafi-gitlab-integration/tlsprotect-vcert:2-x86_64
   script:
     - venafi-vcert-request-certificate
   variables:
