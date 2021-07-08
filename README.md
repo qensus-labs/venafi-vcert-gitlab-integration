@@ -5,6 +5,7 @@ This plugin integrates [Venafi Machine Identity Management](https://support.vena
 **Table of contents**
 
  - [Usage overview](#usage-overview)
+ - [Setting up the TPP](#setting-up-the-tpp)
  - [Setting up executor hosts (shell and SSH executors only)](#setting-up-executor-hosts-shell-and-ssh-executors-only)
  - [Compatibility](#compatibility)
  - [Operations](#operations)
@@ -25,6 +26,32 @@ This plugin integrates [Venafi Machine Identity Management](https://support.vena
 You must already have access to either Venafi TLS Protect (part of the Venafi Trust Protection Platform™) or Venafi as a Service. This Gitlab integration product requires you to specify the connection address and authentication details.
 
 You use this Gitlab integration product by defining, inside your Gitlab CI YAML, jobs call operations provided by this Gitlab integration product.
+
+## Setting up the TPP
+
+_This is not applicable when using Venafi as a Service._
+
+If you plan on using this Gitlab integration product in combination with a TPP, then you must setup an API Application Integration:
+
+ 1. Go to your TPP's Aperture web interface.
+ 2. Go the Platform product.
+ 3. In the top navbar, click API ➜ API Application Integrations.
+ 4. Click "New Application Integration".
+ 5. Under "Type of Integration", select "Vendor Integration". Paste the following JSON:
+
+    ~~~json
+    {
+        "id": "fullstaq-vcert-gitlab",
+        "name": "Fullstaq VCert Gitlab",
+        "vendor": "Fullstaq B.V.",
+        "description": "Venafi Machine Identity Management integration for Gitlab",
+        "scope": "certificate:manage"
+    }
+    ~~~
+
+    Then click Save.
+
+ 6. Select the "Fullstaq VCert Gitlab" integration and click "Edit Access". Grant access to the TPP user account that you want to use from Jenkins.
 
 ## Setting up executor hosts (shell and SSH executors only)
 
@@ -70,7 +97,7 @@ request_cert:
     - venafi-vcert-request-certificate
   variables:
     ## Specify TPP or Venafi as a Service parameters
-    TPP_BASE_URL: https://my-tpp/vedsdk
+    TPP_BASE_URL: https://my-tpp
     TPP_USERNAME: my_username
     # TPP_PASSWORD or TPP_PASSWORD_BASE64 should be set in the UI, with masking enabled.
 
@@ -109,7 +136,7 @@ request_cert:
     - venafi-vcert-request-certificate
   variables:
     ## Specify TPP or Venafi as a Service parameters
-    TPP_BASE_URL: https://my-tpp/vedsdk
+    TPP_BASE_URL: https://my-tpp
     TPP_USERNAME: my_username
     # TPP_PASSWORD or TPP_PASSWORD_BASE64 should be set in the UI, with masking enabled.
 
@@ -137,7 +164,7 @@ request_cert:
 
 Required (when using a TPP):
 
- * `TPP_BASE_URL`: The TPP's VCert base URL.
+ * `TPP_BASE_URL`: The TPP's base URL. It must not contain the `/vedsdk` suffix path.
  * `TPP_USERNAME`: A login username for the TPP.
  * `TPP_PASSWORD` or `TPP_PASSWORD_BASE64`: The password associated with the login username. You can specify it normally, or in Base64 format. The latter is useful for storing the password in a Gitlab variable, in masked form, because Gitlab can only mask variables whose content only consists of Base64 characters.
 
@@ -342,7 +369,7 @@ request_cert:
   script:
     - venafi-vcert-request-certificate
   variables:
-    TPP_BASE_URL: https://my-tpp/vedsdk
+    TPP_BASE_URL: https://my-tpp
     TPP_USERNAME: my_username
     # TPP_PASSWORD or TPP_PASSWORD_BASE64 should be set in the UI, with masking enabled.
 

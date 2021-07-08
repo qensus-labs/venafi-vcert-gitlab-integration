@@ -12,6 +12,10 @@ import time
 import vcert
 import vcert.pem
 
+
+OAUTH_SCOPE = 'certificate:manage'
+CLIENT_ID = 'fullstaq-vcert-gitlab'
+
 config_schema = dict(
     TPP_BASE_URL=dict(cast=str, default=None),
     TPP_USERNAME=dict(cast=str, default=None),
@@ -159,11 +163,21 @@ class RequestCertificateCommand:
 
     def _create_connection_object(self) -> vcert.CommonConnection:
         if self.config.tpp_base_url is not None:
-            return vcert.Connection(
+            conn = vcert.TPPTokenConnection(
                 url=self.config.tpp_base_url,
                 user=self.config.tpp_username,
                 password=self._get_tpp_password()
             )
+
+            self.logger.info('Authenticating')
+            auth = vcert.common.Authentication(
+                user=self.config.tpp_username,
+                password=self._get_tpp_password(),
+                client_id=CLIENT_ID,
+                scope=OAUTH_SCOPE)
+            conn.get_access_token(auth)
+
+            return conn
         else:
             return vcert.Connection(token=self.config.venafi_as_a_service_api_key)
 
