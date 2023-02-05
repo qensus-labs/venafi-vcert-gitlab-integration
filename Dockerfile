@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9-slim
 
 ADD . /build
 # We run 'pip install --use-feature=2020-resolver' because vcert 0.11 requires

@@ -14,7 +14,7 @@ import vcert.pem
 
 
 OAUTH_SCOPE = 'certificate:manage'
-CLIENT_ID = 'fullstaq-vcert-gitlab'
+CLIENT_ID = 'qensus-vcert-gitlab'
 
 config_schema = dict(
     TPP_BASE_URL=dict(cast=str, default=None),
